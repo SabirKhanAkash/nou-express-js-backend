@@ -1,0 +1,40 @@
+{
+  "name": "nou-express-js-backend",
+  "version": "1.1.0 beta",
+  "description": "backend for nou app",
+  "main": "app.js",
+  "scripts": {
+    "p": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
+    "start": "nodemon server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SabirKhanAkash/nou-express-js-backend.git"
+  },
+  "keywords": [
+    "express.js",
+    "node.js",
+    "mongodb"
+  ],
+  "author": "Sabir Khan Akash",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.1.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "libphonenumber-js": "^1.10.49",
+    "mongoose": "^7.2.1",
+    "nodemon": "^2.0.22",
+    "twilio": "^4.19.0"
+  },
+  "bugs": {
+    "url": "https://github.com/SabirKhanAkash/nou-express-js-backend/issues"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  },
+  "homepage": "https://github.com/SabirKhanAkash/nou-express-js-backend#readme"
+}
