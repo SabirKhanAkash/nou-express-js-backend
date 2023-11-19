@@ -6,7 +6,6 @@ const userRouter = require("./app/src/modules/users/user.router");
 const otpVerifyRouter = require("./auth/otpVerify.router");
 const loginRouter = require("./auth/login.router");
 const ticketRouter = require("./app/src/modules/ticket/ticket.router");
-require("dotenv").config();
 const { acl } = require("./auth/permission");
 
 app.use(express.json());

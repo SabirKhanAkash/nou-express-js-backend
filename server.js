@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const app = require("./app");
 const port = process.env.PORT;
-require("dotenv").config();
 
 function dbConnection() {
   try {

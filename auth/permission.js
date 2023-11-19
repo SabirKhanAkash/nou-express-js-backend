@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-require("dotenv").config();
 const { createLog } = require("../app/src/modules/appLogs/appLog.service");
 
 let userData = {};

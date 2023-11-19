@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const twilio = require("twilio");
 const { createLog } = require("../app/src/modules/appLogs/appLog.service");
 const User = require("../app/src/modules/users/user.model");
-require("dotenv").config();
 const { parsePhoneNumberFromString } = require("libphonenumber-js");
 
 // Twilio credentials
