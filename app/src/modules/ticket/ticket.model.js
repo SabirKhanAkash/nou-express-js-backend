@@ -28,6 +28,10 @@ const ticketSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  sold_by: {
+    type: String,
+    default: null,
+  },
   is_active: {
     type: Boolean,
     default: true,

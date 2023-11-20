@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   },
   otp: {
     type: String,
-    default: null,
+    default: "0000",
   },
   username: {
     type: String,
@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   created_by: {
     type: String,
+    default: "System",
   },
   updated_date: {
     type: String,

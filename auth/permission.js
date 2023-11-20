@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const axios = require("axios");
 const { createLog } = require("../app/src/modules/appLogs/appLog.service");
 
 let userData = {};
@@ -7,8 +6,11 @@ let userData = {};
 // Verify acl
 const acl = async (req, res, next) => {
   let check;
-  const accessToken = req.headers.token;
+  const accessToken = req.headers.auth;
   const refreshToken = req.headers.refresh;
+
+  // console.log("accessToken: " + accessToken);
+  // console.log("refreshToken: " + refreshToken);
 
   if (!accessToken || !refreshToken) {
     check = false;

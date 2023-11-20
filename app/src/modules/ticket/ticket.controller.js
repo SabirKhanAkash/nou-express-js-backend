@@ -89,14 +89,14 @@ const edit = async (req, res, next) => {
 
 const search = async (req, res, next) => {
   const phone_no = req.headers.phone_no;
-  const ticketBody = req.body.ticketBody;
+  const ticketBody = req.body;
   let tickets = null;
   try {
     tickets = await lookup(phone_no, ticketBody);
   } catch (e) {
     await createLog(e);
   } finally {
-    if (tickets !== null) {
+    if (tickets !== null && tickets.status === "Success") {
       res.send({
         tickets,
         status: "Success",

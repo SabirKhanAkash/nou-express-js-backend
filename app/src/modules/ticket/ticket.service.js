@@ -11,7 +11,6 @@ const list = async () => {
     compactData["count"] = await Ticket.countDocuments({});
   } catch (error) {
     await createLog(error);
-    compactData["error"] = error.message;
   } finally {
     return compactData;
   }
@@ -23,7 +22,6 @@ const show = async (id) => {
     showData = await Ticket.findOne({ _id: id }).exec();
   } catch (error) {
     await createLog(error);
-    showData["error"] = error.message;
   } finally {
     return showData;
   }
@@ -90,7 +88,6 @@ const save = async (data) => {
     }
   } catch (error) {
     await createLog(error);
-    saveData["error"] = error.message;
   } finally {
     return saveData;
   }
@@ -114,7 +111,6 @@ const update = async (id, data) => {
     ).exec();
   } catch (error) {
     await createLog(error);
-    updateData["error"] = error.message;
   } finally {
     return updateData;
   }
@@ -123,28 +119,40 @@ const update = async (id, data) => {
 const lookup = async (phone_no, ticketBody) => {
   let lookupData = {};
   try {
-    availableTicketCount = await Ticket.find({
+    let ticketList;
+    const formattedDate = new Date(ticketBody.journeyDateTime);
+    const formattedDateString =
+      formattedDate.toDateString() +
+      " " +
+      formattedDate.toLocaleTimeString("en-US", {
+        hour12: false,
+        timeZone: "Asia/Dhaka",
+      }) + " GMT+0600 (Bangladesh Standard Time)";
+    const availableTicketCount = await Ticket.find({
       seat_category: ticketBody.seat_category,
       source: ticketBody.source,
       destination: ticketBody.destination,
-      journeyDateTime: ticketBody.journeyDateTime,
+      journeyDateTime: formattedDateString,
       sold: false,
       is_active: true,
     }).countDocuments({});
+    
     if (availableTicketCount >= ticketBody.adultItemCount) {
-      lookupData["ticketList"] = await Ticket.find({
+      ticketList = await Ticket.find({
         seat_category: ticketBody.seat_category,
         source: ticketBody.source,
         destination: ticketBody.destination,
-        journeyDateTime: ticketBody.journeyDateTime,
+        journeyDateTime: formattedDateString,
         sold: false,
         is_active: true,
-      }).exec();
-      lookupData["count"] = availableTicketCount;
+      });  
     }
+    lookupData["ticketList"] = ticketList;
+    lookupData["count"] = availableTicketCount;
+    lookupData["status"] = "Success";
   } catch (error) {
     await createLog(error);
-    lookupData["error"] = error.message;
+    lookupData["status"] = "Failed";
   } finally {
     return lookupData;
   }
