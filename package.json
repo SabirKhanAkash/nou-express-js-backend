@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.0",
     "libphonenumber-js": "^1.10.49",
     "mongoose": "^7.2.1",
+    "node-schedule": "^2.1.1",
     "nodemon": "^2.0.22",
     "twilio": "^4.19.0"
   },

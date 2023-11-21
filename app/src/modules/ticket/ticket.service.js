@@ -30,9 +30,10 @@ const show = async (id) => {
 const save = async (data) => {
   let saveData = {};
   try {
-    for (let i = 0; i < 24; i = i + 8) {
+    for (let i = 0; i < 24; i = i + 1) {
       const date = new Date(new Date());
       date.setHours(i);
+      date.setMinutes(0);
       data.journeyDateTime = `${date.toDateString()} ${date
         .getHours()
         .toString()
@@ -127,7 +128,8 @@ const lookup = async (phone_no, ticketBody) => {
       formattedDate.toLocaleTimeString("en-US", {
         hour12: false,
         timeZone: "Asia/Dhaka",
-      }) + " GMT+0600 (Bangladesh Standard Time)";
+      }) +
+      " GMT+0600 (Bangladesh Standard Time)";
     const availableTicketCount = await Ticket.find({
       seat_category: ticketBody.seat_category,
       source: ticketBody.source,
@@ -136,7 +138,7 @@ const lookup = async (phone_no, ticketBody) => {
       sold: false,
       is_active: true,
     }).countDocuments({});
-    
+
     if (availableTicketCount >= ticketBody.adultItemCount) {
       ticketList = await Ticket.find({
         seat_category: ticketBody.seat_category,
@@ -145,7 +147,7 @@ const lookup = async (phone_no, ticketBody) => {
         journeyDateTime: formattedDateString,
         sold: false,
         is_active: true,
-      });  
+      });
     }
     lookupData["ticketList"] = ticketList;
     lookupData["count"] = availableTicketCount;
