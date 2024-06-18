@@ -27,23 +27,40 @@ const generateOTP = async (phone_no) => {
           },
         },
       );
-      return new Promise((resolve, reject) => {
-        client.messages
-          .create({
-            body: `Your OTP code is ${otp}`,
-            from: twillioPhoneNumber,
-            to: "+88" + phone_no,
-          })
-          .then((message) => {
-            resolve("OTP sent successfully!");
-          })
-          .catch((err) => {
-            console.error(err);
-            reject("Failed to send OTP");
-          });
-      });
+      client.messages
+        .create({
+          body: `Your OTP code is ${otp}`,
+          from: twillioPhoneNumber,
+          to: "+88" + phone_no,
+        })
+        .then(() => {
+          resolve("OTP sent successfully!");
+        })
+        .catch(async (err) => {
+          await User.updateOne(
+            {
+              phone_no: phone_no,
+            },
+            {
+              $set: {
+                otp: "0000",
+              },
+            },
+          );
+          createLog(err);
+        });
     }
   } catch (e) {
+    await User.updateOne(
+      {
+        phone_no: phone_no,
+      },
+      {
+        $set: {
+          otp: "0000",
+        },
+      },
+    );
     createLog(e);
   }
 };

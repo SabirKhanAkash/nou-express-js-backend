@@ -7,8 +7,13 @@ const isUserAuthorized = async (phone_no) => {
   try {
     phoneNoFound = await User.findOne({ phone_no: phone_no }).exec();
     if (phoneNoFound) {
-      generateOTP(phone_no);
-      authorizedUser["isAuthorized"] = true;
+      try {
+        generateOTP(phone_no);
+      } catch (err) {
+        await createLog(err);
+      } finally {
+        authorizedUser["isAuthorized"] = true;
+      }
     } else {
       authorizedUser["isAuthorized"] = false;
     }
