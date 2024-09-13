@@ -20,9 +20,9 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  journeyDateTime: {
-    type: String,
-    default: null,
+  journey_date_time: {
+    type: Number,
+    default: Date.now(),
   },
   sold: {
     type: Boolean,

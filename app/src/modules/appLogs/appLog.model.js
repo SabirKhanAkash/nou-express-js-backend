@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 // create schema
 const appLogSchema = new mongoose.Schema({
   timestamp: {
-    type: String,
+    type: Number,
   },
   name: {
     type: String,

@@ -2,7 +2,8 @@ const { userData } = require("../../../../auth/permission");
 const Ticket = require("./ticket.model");
 const { createLog } = require("../appLogs/appLog.service");
 const package = require("../../../../package.json");
-const version = package.version;
+const { paginate } = require("../../../../sharedUtils/paginate");
+const version = package?.version;
 
 const list = async () => {
   let compactData = {};
@@ -28,79 +29,54 @@ const show = async (id) => {
 };
 
 const save = async (data) => {
-  let saveData = {};
+  let saveData = {},
+    success = 0,
+    failure = 0;
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+
   try {
-    for (let i = 0; i < 24; i = i + 1) {
-      const date = new Date(new Date());
-      date.setHours(i);
-      date.setMinutes(0);
-      data.journeyDateTime = `${date.toDateString()} ${date
-        .getHours()
-        .toString()
-        .padStart(2, "0")}:${date
-        .getMinutes()
-        .toString()
-        .padStart(2, "0")}:00 GMT+0600 (Bangladesh Standard Time)`;
-      for (let j = 0; j < data.count; j++) {
-        if (data.seat_category == "ফ্লোর" || data.seat_category == "Floor") {
-          data.price = 70;
-        }
-        if (data.seat_category == "ডেক" || data.seat_category == "Deck") {
-          data.price = 100;
-        }
-        if (data.seat_category == "চেয়ার" || data.seat_category == "Chair") {
-          data.price = 150;
-        }
-        if (
-          data.seat_category == "এসি চেয়ার" ||
-          data.seat_category == "AC Chair"
-        ) {
-          data.price = 200;
-        }
-        if (
-          data.seat_category == "সিঙ্গেল কেবিন" ||
-          data.seat_category == "Single Cabin"
-        ) {
-          data.price = 800;
-        }
-        if (
-          data.seat_category == "এসি সিঙ্গেল কেবিন" ||
-          data.seat_category == "AC Single Cabin"
-        ) {
-          data.price = 1000;
-        }
-        if (
-          data.seat_category == "ডাবল কেবিন" ||
-          data.seat_category == "Double Cabin"
-        ) {
-          data.price = 1200;
-        }
-        if (
-          data.seat_category == "এসি ডাবল কেবিন" ||
-          data.seat_category == "AC Double Cabin"
-        ) {
-          data.price = 1500;
-        }
-        if (data.seat_category == "ভিআইপি" || data.seat_category == "VIP") {
-          data.price = 2000;
-        }
+    for (let hour = 0; hour < data?.journey_time?.length; hour++) {
+      const day =
+        data?.journey_time[hour]?.startsWith("12") &&
+        data?.journey_time[hour]?.includes("AM")
+          ? String(today.getDate() + 1).padStart(2, "0")
+          : String(today.getDate()).padStart(2, "0");
+      const dateTimeString = `${year}-${month}-${day} ${data?.journey_time[hour]}`;
+      const journeyDate = new Date(dateTimeString);
+      data.journey_date_time = journeyDate.getTime();
+      for (let seat_count = 0; seat_count < data?.count; seat_count++) {
+        if (data?.seat_category == "ফ্লোর") data.price = 70;
+        if (data?.seat_category == "ডেক") data.price = 100;
+        if (data?.seat_category == "চেয়ার") data.price = 150;
+        if (data?.seat_category == "এসি চেয়ার") data.price = 200;
+        if (data?.seat_category == "সিঙ্গেল কেবিন") data.price = 800;
+        if (data?.seat_category == "এসি সিঙ্গেল কেবিন") data.price = 1000;
+        if (data?.seat_category == "ডাবল কেবিন") data.price = 1200;
+        if (data?.seat_category == "এসি ডাবল কেবিন") data.price = 1500;
+        if (data?.seat_category == "ভিআইপি") data.price = 2000;
         saveData = new Ticket(data).save();
+        success++;
       }
     }
   } catch (error) {
+    failure++;
     await createLog(error);
   } finally {
-    return saveData;
+    return { success, failure, saveData };
   }
 };
 
 const update = async (id, data) => {
   let updateData = {};
   try {
-    updateData = await Ticket.findByIdAndUpdate(
-      id,
+    updateData = await Ticket.findOneAndUpdate(
+      { _id: id },
       {
-        price: data.price,
+        is_active:
+          data && data?.is_active != undefined ? data?.is_active : undefined,
+        price: data && data?.price ? data?.price : undefined,
         updated_date: new Date(),
         updated_by: "System",
         data_source: "System",
@@ -117,43 +93,65 @@ const update = async (id, data) => {
   }
 };
 
-const lookup = async (phone_no, ticketBody) => {
+const lookup = async (page_no, ticketBody) => {
   let lookupData = {};
+  const perPage = 48;
   try {
-    let ticketList;
-    const formattedDate = new Date(ticketBody.journeyDateTime);
-    const formattedDateString =
-      formattedDate.toDateString() +
-      " " +
-      formattedDate.toLocaleTimeString("en-US", {
-        hour12: false,
-        timeZone: "Asia/Dhaka",
-      }) +
-      " GMT+0600 (Bangladesh Standard Time)";
-    const availableTicketCount = await Ticket.find({
-      seat_category: ticketBody.seat_category,
-      source: ticketBody.source,
-      destination: ticketBody.destination,
-      journeyDateTime: formattedDateString,
+    const date = ticketBody?.date?.trim()?.split(" ")[1];
+    const time = `${ticketBody?.time?.trim()?.split(" ")[1]} ${
+      ticketBody?.time?.split(" ")[2]
+    }`;
+    const [day, month, year] = date?.split("/");
+    const dateTime = `${month}/${day}/20${year} ${time}`;
+    const dateTimeObject = new Date(dateTime);
+    const journeyDateTime = dateTimeObject?.getTime();
+
+    const totalCount = await Ticket.countDocuments({
+      seat_category: ticketBody?.seatType,
+      source: ticketBody?.source,
+      destination: ticketBody?.destination,
+      journey_date_time: journeyDateTime,
       sold: false,
       is_active: true,
-    }).countDocuments({});
+    });
 
-    if (availableTicketCount >= ticketBody.adultItemCount) {
-      ticketList = await Ticket.find({
-        seat_category: ticketBody.seat_category,
-        source: ticketBody.source,
-        destination: ticketBody.destination,
-        journeyDateTime: formattedDateString,
-        sold: false,
-        is_active: true,
-      });
-    }
-    lookupData["ticketList"] = ticketList;
-    lookupData["count"] = availableTicketCount;
-    lookupData["status"] = "Success";
+    const { totalPages, skipValue } = paginate({
+      pageNumber: page_no,
+      perPage: perPage,
+      totalCount: totalCount,
+    });
+
+    const ticketList = await Ticket.find({
+      seat_category: ticketBody?.seatType,
+      source: ticketBody?.source,
+      destination: ticketBody?.destination,
+      journey_date_time: journeyDateTime,
+      sold: false,
+      is_active: true,
+    })
+      .skip(skipValue)
+      .sort({ _id: -1 })
+      .lean();
+
+    lookupData = {
+      ticketList:
+        ticketList?.length <
+        ticketBody?.passengerCount + ticketBody?.childPassengerCount
+          ? []
+          : ticketList,
+      count:
+        ticketList?.length <
+        ticketBody?.passengerCount + ticketBody?.childPassengerCount
+          ? 0
+          : totalCount,
+      totalPages: totalPages,
+      status: "Success",
+    };
   } catch (error) {
     await createLog(error);
+    lookupData = {
+      status: "Failed",
+    };
     lookupData["status"] = "Failed";
   } finally {
     return lookupData;

@@ -23,7 +23,7 @@ const index = async (req, res, next) => {
 };
 
 const view = async (req, res, next) => {
-  const { id } = req.params;
+  const { id } = req?.params;
   let ticket = null;
   try {
     ticket = await show(id);
@@ -45,8 +45,7 @@ const view = async (req, res, next) => {
 };
 
 const create = async (req, res, next) => {
-  const data = req.body;
-  let user = null;
+  const data = req?.body;
   try {
     ticket = await save(data);
   } catch (e) {
@@ -66,8 +65,8 @@ const create = async (req, res, next) => {
 };
 
 const edit = async (req, res, next) => {
-  const { id } = req.params;
-  const bodyData = req.body;
+  const { id } = req?.params;
+  const bodyData = req?.body;
   try {
     ticket = await update(id, bodyData);
   } catch (e) {
@@ -88,17 +87,17 @@ const edit = async (req, res, next) => {
 };
 
 const search = async (req, res, next) => {
-  const phone_no = req.headers.phone_no;
-  const ticketBody = req.body;
+  const { page_no = 1 } = req?.query;
+  const ticketBody = req?.body;
   let tickets = null;
   try {
-    tickets = await lookup(phone_no, ticketBody);
+    tickets = await lookup(page_no, ticketBody);
   } catch (e) {
     await createLog(e);
   } finally {
-    if (tickets !== null && tickets.status === "Success") {
+    if (tickets && tickets?.status === "Success") {
       res.send({
-        tickets,
+        tickets: tickets,
         status: "Success",
       });
     } else {

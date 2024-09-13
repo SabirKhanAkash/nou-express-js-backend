@@ -2,12 +2,12 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 var cors = require("cors");
-const mongoose = require("mongoose");
 const userRouter = require("./app/src/modules/users/user.router");
 const otpVerifyRouter = require("./auth/otpVerify.router");
 const loginRouter = require("./auth/login.router");
 const ticketRouter = require("./app/src/modules/ticket/ticket.router");
 const generateTicket = require("./scheduledCalls/generateTicket.js");
+const invalidateTicket = require("./scheduledCalls/invalidateTicket.js");
 const { acl } = require("./auth/permission");
 
 app.use(express.json());
@@ -19,6 +19,7 @@ app.use("/otp-verify", otpVerifyRouter);
 app.use("/internal/ticket", ticketRouter);
 
 generateTicket;
+invalidateTicket;
 
 // ACL verification
 app.use(acl);
