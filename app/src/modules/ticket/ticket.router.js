@@ -2,7 +2,7 @@ const express = require("express");
 const { index, view, create, edit, search } = require("./ticket.controller");
 const router = express.Router();
 
-// All user route here
+// All Ticket route here
 router.post("/index", index);
 router.post("/view/:id", view);
 router.post("/create", create);
