@@ -2,7 +2,7 @@ const schedule = require("node-schedule");
 const { save } = require("../app/src/modules/ticket/ticket.service");
 
 const generateTicket = schedule.scheduleJob(
-  "00 50 21 * * *",
+  "00 01 00 * * *",
   async function () {
     const seat_types = [
       { name: "ফ্লোর", capacity: 36 },
@@ -133,9 +133,9 @@ const generateTicket = schedule.scheduleJob(
     console.log(
       `Total ${
         totalSuccess - totalFailure
-      } Ticket(s) created for ${new Date().toLocaleDateString()}!`,
+      } Ticket(s) created for ${new Date().toLocaleDateString()}!`
     );
-  },
+  }
 );
 
 module.exports = generateTicket;
