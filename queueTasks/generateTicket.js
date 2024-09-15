@@ -134,10 +134,10 @@ const generateTicket = async () => {
   console.log(
     `Total ${
       totalSuccess - totalFailure
-    } Ticket(s) created for ${new Date().toLocaleDateString()}!`,
+    } Ticket(s) created for ${new Date().toLocaleDateString()}!`
   );
 };
 
-ticketQueue.add("generateTicket", {}, { repeat: { cron: "15 1 * * *" } });
+ticketQueue.add("generateTicket", {}, { repeat: { cron: "0 1 * * *" } });
 
 module.exports = generateTicket;
