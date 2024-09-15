@@ -2,7 +2,7 @@ const schedule = require("node-schedule");
 const { save } = require("../app/src/modules/ticket/ticket.service");
 
 const generateTicket = schedule.scheduleJob(
-  "00 00 01 * * *",
+  "00 50 21 * * *",
   async function () {
     const seat_types = [
       { name: "ফ্লোর", capacity: 36 },
