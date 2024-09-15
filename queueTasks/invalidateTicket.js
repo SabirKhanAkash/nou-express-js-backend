@@ -1,9 +1,14 @@
-const schedule = require("node-schedule");
+const { Queue } = require("bullmq");
 const package = require("../package.json");
 const version = package?.version;
 const Ticket = require("../app/src/modules/ticket/ticket.model");
+const { default: IORedis } = require("ioredis");
 
-const invalidateTicket = schedule.scheduleJob("01 * * * *", async function () {
+const redisConnection = { connection: new IORedis(process.env.REDIS_URL) };
+
+const ticketQueue = new Queue("ticketQueue", redisConnection);
+
+const invalidateTicket = async () => {
   let updateData;
   try {
     updateData = await Ticket.updateMany(
@@ -28,6 +33,8 @@ const invalidateTicket = schedule.scheduleJob("01 * * * *", async function () {
       } Ticket(s) invalidated which was before ${new Date().toLocaleTimeString()} of ${new Date().toLocaleDateString()} !`,
     );
   }
-});
+};
+
+ticketQueue.add("invalidateTicket", {}, { repeat: { cron: "1 * * * *" } });
 
 module.exports = invalidateTicket;
