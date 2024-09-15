@@ -3,7 +3,7 @@ const package = require("../package.json");
 const version = package?.version;
 const Ticket = require("../app/src/modules/ticket/ticket.model");
 
-const invalidateTicket = schedule.scheduleJob("01 * * * *", async function () {
+const invalidateTicket = schedule.scheduleJob("15 * * * *", async function () {
   let updateData;
   try {
     updateData = await Ticket.updateMany(
