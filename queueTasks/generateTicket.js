@@ -1,10 +1,5 @@
-const { Queue } = require("bullmq");
 const { save } = require("../app/src/modules/ticket/ticket.service");
-const { default: IORedis } = require("ioredis");
-
-const redisConnection = { connection: new IORedis(process.env.REDIS_URL) };
-
-const ticketQueue = new Queue("ticketQueue", redisConnection);
+const { ticketQueue } = require("./bullmq");
 
 const generateTicket = async () => {
   const seat_types = [
@@ -18,6 +13,7 @@ const generateTicket = async () => {
     { name: "এসি ডাবল কেবিন", capacity: 4 },
     { name: "ভিআইপি", capacity: 4 },
   ];
+
   const masterStations = [
     "ঢাকা",
     "গাজীপুর",
@@ -86,6 +82,7 @@ const generateTicket = async () => {
   ];
 
   const stations = ["ঢাকা", "চাঁদপুর"];
+
   const journey_time = [
     "06:00 AM",
     "06:45 AM",
@@ -113,6 +110,7 @@ const generateTicket = async () => {
 
   let totalSuccess = 0,
     totalFailure = 0;
+
   for (let source = 0; source < stations?.length; source++) {
     for (let destination = 0; destination < stations?.length; destination++) {
       if (stations[source] !== stations[destination]) {
@@ -134,7 +132,7 @@ const generateTicket = async () => {
   console.log(
     `Total ${
       totalSuccess - totalFailure
-    } Ticket(s) created for ${new Date().toLocaleDateString()}!`
+    } Ticket(s) created for ${new Date().toLocaleDateString()}!`,
   );
 };
 

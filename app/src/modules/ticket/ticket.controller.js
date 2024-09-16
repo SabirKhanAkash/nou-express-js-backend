@@ -10,7 +10,7 @@ const index = async (req, res, next) => {
   } finally {
     if (tickets !== null) {
       res.send({
-        tickets,
+        data: tickets,
         status: "Success",
       });
     } else {
@@ -32,7 +32,7 @@ const view = async (req, res, next) => {
   } finally {
     if (ticket !== null) {
       res.send({
-        ticket,
+        data: ticket,
         status: "Success",
       });
     } else {
@@ -74,7 +74,7 @@ const edit = async (req, res, next) => {
   } finally {
     if (ticket !== null) {
       res.send({
-        ticket,
+        data: ticket,
         status: "Success",
       });
     } else {
@@ -87,17 +87,16 @@ const edit = async (req, res, next) => {
 };
 
 const search = async (req, res, next) => {
-  const { page_no = 1 } = req?.query;
-  const ticketBody = req?.body;
   let tickets = null;
   try {
-    tickets = await lookup(page_no, ticketBody);
+    tickets = await lookup(req?.query);
+    // console.log(tickets);
   } catch (e) {
     await createLog(e);
   } finally {
     if (tickets && tickets?.status === "Success") {
       res.send({
-        tickets: tickets,
+        data: tickets,
         status: "Success",
       });
     } else {

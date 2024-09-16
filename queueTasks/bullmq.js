@@ -1,15 +1,14 @@
 const { Queue } = require("bullmq");
 const { default: IORedis } = require("ioredis");
-
-const connection = new IORedis({
-  host: process.env.REDIS_HOST || "127.0.0.1",
-  port: process.env.REDIS_PORT || 6379,
+const redisConnection = { connection: new IORedis(process.env.REDIS_URL) };
+const workerRedisConnection = new IORedis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: null,
 });
 
-const ticketQueue = new Queue("ticketQueue", {
-  connection,
-});
+const ticketQueue = new Queue("ticketQueue", redisConnection);
 
 module.exports = {
   ticketQueue,
+  workerRedisConnection,
+  redisConnection,
 };

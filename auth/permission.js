@@ -1,70 +1,78 @@
 const jwt = require("jsonwebtoken");
 const { createLog } = require("../app/src/modules/appLogs/appLog.service");
-
 let userData = {};
 
-// Verify acl
+// Middleware for ACL verification
 const acl = async (req, res, next) => {
-  let check;
-  const accessToken = req.headers.auth;
-  const refreshToken = req.headers.refresh;
+  try {
+    const accessToken = req?.headers["authorization"]?.split(" ")[1];
+    const refreshToken = req?.headers["refresh"];
 
-  // console.log("accessToken: " + accessToken);
-  // console.log("refreshToken: " + refreshToken);
+    if (!accessToken) {
+      return res
+        .status(401)
+        .send({ token: false, message: "Access token missing" });
+    }
+    userData.infos = await getUserData(accessToken);
 
-  if (!accessToken || !refreshToken) {
-    check = false;
-    return res.send({
-      token: false,
-      message: "Unauthorized access",
-    });
-  }
-  let info = await getUserData(accessToken);
-  userData.infos = info;
-  const response = await verification(req, accessToken, refreshToken);
-  if (response === true) {
-    check = true;
-  } else {
-    check = false;
-  }
-  if (check === true) {
-    next();
-  } else {
-    res.send({
-      token: false,
-      message: "Unauthorised user",
-    });
+    const decodedAccessToken = await verifyAccessToken(req, accessToken);
+    if (decodedAccessToken) {
+      req.decoded = decodedAccessToken;
+      next();
+    } else if (refreshToken) {
+      const decodedRefreshToken = await verifyRefreshToken(req, refreshToken);
+
+      if (decodedRefreshToken) {
+        delete decodedRefreshToken.exp;
+
+        const newAccessToken = jwt.sign(
+          decodedRefreshToken,
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "15m" },
+        );
+
+        res.setHeader("Authorization", `Bearer ${newAccessToken}`);
+        req.decoded = decodedRefreshToken;
+        next();
+      } else {
+        return res
+          .status(401)
+          .send({ token: false, message: "Invalid refresh token" });
+      }
+    } else {
+      return res
+        .status(401)
+        .send({ token: false, message: "Invalid access token" });
+    }
+  } catch (error) {
+    await createLog(error);
+    return res
+      .status(500)
+      .send({ token: false, message: "Internal server error" });
   }
 };
 
-const verification = async (req, accessToken, refreshToken) => {
+const verifyAccessToken = async (req, accessToken) => {
   try {
-    if (!accessToken || !refreshToken) {
-      return false;
-    }
-
-    const decodedAccessToken = jwt.verify(
+    const decodedToken = jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET,
     );
+    return decodedToken;
+  } catch (error) {
+    return null;
+  }
+};
 
-    req.decoded = decodedAccessToken;
-
-    return true;
-  } catch (accessTokenError) {
-    try {
-      const decodedRefreshToken = jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
-      );
-
-      req.decoded = decodedRefreshToken;
-
-      return true;
-    } catch (refreshTokenError) {
-      console.log(refreshTokenError);
-      return false;
-    }
+const verifyRefreshToken = async (req, refreshToken) => {
+  try {
+    const decodedToken = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    );
+    return decodedToken;
+  } catch (error) {
+    return null;
   }
 };
 
@@ -77,4 +85,4 @@ const getUserData = async (token) => {
   }
 };
 
-module.exports = { acl, userData };
+module.exports = { acl };

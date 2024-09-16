@@ -32,6 +32,10 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  sold_to: {
+    type: String,
+    default: null,
+  },
   is_active: {
     type: Boolean,
     default: true,

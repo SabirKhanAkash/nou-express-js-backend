@@ -13,9 +13,10 @@ app.use(cors());
 
 app.use("/internal/users", userRouter);
 app.use("/login", loginRouter);
-app.use("/otp-verify", otpVerifyRouter);
+app.use("/verify-otp", otpVerifyRouter);
 app.use("/internal/ticket", ticketRouter);
 
+require("./queueTasks/bullmq.js");
 require("./queueTasks/generateTicket.js");
 require("./queueTasks/invalidateTicket.js");
 require("./queueTasks/worker.js");

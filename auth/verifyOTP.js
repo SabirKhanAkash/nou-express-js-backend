@@ -9,7 +9,7 @@ const otpVerify = async (req, res) => {
       phone_no: req.headers.phone_no,
       otp: req.headers.otp,
     };
-    const user = await User.findOne({ phone_no: userData.phone_no });
+    const user = await User.findOne({ phone_no: userData?.phone_no });
 
     if (user.otp === userData.otp) {
       const authToken = jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET, {

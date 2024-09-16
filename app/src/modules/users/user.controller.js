@@ -10,7 +10,7 @@ const index = async (req, res, next) => {
   } finally {
     if (users !== null) {
       res.send({
-        users,
+        data: users,
         status: "Success",
       });
     } else {
@@ -32,7 +32,7 @@ const view = async (req, res, next) => {
   } finally {
     if (user !== null) {
       res.send({
-        user,
+        data: user,
         status: "Success",
       });
     } else {
@@ -54,7 +54,7 @@ const create = async (req, res, next) => {
   } finally {
     if (user !== null) {
       res.send({
-        user,
+        data: user,
         status: "Success",
       });
     } else {
@@ -76,7 +76,7 @@ const edit = async (req, res, next) => {
   } finally {
     if (user !== null) {
       res.send({
-        user,
+        data: user,
         status: "Success",
       });
     } else {

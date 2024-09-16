@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "Approved",
   },
+  is_active: {
+    type: Boolean,
+    default: true,
+  },
   app_version: {
     type: String,
     default: "1.0.0",

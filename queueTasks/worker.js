@@ -1,11 +1,7 @@
 const { Worker } = require("bullmq");
-const { default: IORedis } = require("ioredis");
 const generateTicket = require("./generateTicket");
 const invalidateTicket = require("./invalidateTicket");
-
-const redisConnection = new IORedis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: null,
-});
+const { workerRedisConnection } = require("./bullmq");
 
 const generateWorker = new Worker(
   "ticketQueue",
@@ -17,13 +13,14 @@ const generateWorker = new Worker(
     }
   },
   {
-    connection: redisConnection,
+    connection: workerRedisConnection,
   },
 );
 
 generateWorker.on("completed", (job) => {
   console.log(`job ${job.id} has been completed`);
 });
+
 generateWorker.on("failed", (job, err) => {
   console.log(`job ${job.id} failed with error ${err.message}`);
 });

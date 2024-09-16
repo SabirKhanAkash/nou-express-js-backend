@@ -46,6 +46,7 @@ const save = async (data) => {
       const dateTimeString = `${year}-${month}-${day} ${data?.journey_time[hour]}`;
       const journeyDate = new Date(dateTimeString);
       data.journey_date_time = journeyDate.getTime();
+
       for (let seat_count = 0; seat_count < data?.count; seat_count++) {
         if (data?.seat_category == "ফ্লোর") data.price = 70;
         if (data?.seat_category == "ডেক") data.price = 100;
@@ -93,55 +94,63 @@ const update = async (id, data) => {
   }
 };
 
-const lookup = async (page_no, ticketBody) => {
+const lookup = async (query, ticketBody) => {
+  const {
+    pageNo = 1,
+    date = "date 31/12/9999",
+    time = "time 11:59 PM",
+    seatType = "",
+    source = "",
+    destination = "",
+    passengerCount = 0,
+    childPassengerCount = 0,
+  } = query;
   let lookupData = {};
   const perPage = 48;
   try {
-    const date = ticketBody?.date?.trim()?.split(" ")[1];
-    const time = `${ticketBody?.time?.trim()?.split(" ")[1]} ${
-      ticketBody?.time?.split(" ")[2]
+    const formattedDate = date?.trim()?.split(" ")[1];
+    const formattedTime = `${time?.trim()?.split(" ")[1]} ${
+      time?.split(" ")[2]
     }`;
-    const [day, month, year] = date?.split("/");
-    const dateTime = `${month}/${day}/20${year} ${time}`;
+    const [day, month, year] = formattedDate?.split("/");
+    const dateTime = `${month}/${day}/20${year} ${formattedTime}`;
     const dateTimeObject = new Date(dateTime);
     const journeyDateTime = dateTimeObject?.getTime();
 
     const totalCount = await Ticket.countDocuments({
-      seat_category: ticketBody?.seatType,
-      source: ticketBody?.source,
-      destination: ticketBody?.destination,
+      seat_category: { $regex: seatType.toString() },
+      source: { $regex: source.toString() },
+      destination: { $regex: destination.toString() },
       journey_date_time: journeyDateTime,
       sold: false,
       is_active: true,
     });
 
     const { totalPages, skipValue } = paginate({
-      pageNumber: page_no,
+      pageNumber: pageNo,
       perPage: perPage,
       totalCount: totalCount,
     });
 
     const ticketList = await Ticket.find({
-      seat_category: ticketBody?.seatType,
-      source: ticketBody?.source,
-      destination: ticketBody?.destination,
+      seat_category: { $regex: seatType.toString() },
+      source: { $regex: source.toString() },
+      destination: { $regex: destination.toString() },
       journey_date_time: journeyDateTime,
       sold: false,
       is_active: true,
     })
       .skip(skipValue)
-      .sort({ _id: -1 })
+      .sort({ price: 1 })
       .lean();
 
     lookupData = {
       ticketList:
-        ticketList?.length <
-        ticketBody?.passengerCount + ticketBody?.childPassengerCount
+        ticketList?.length < passengerCount + childPassengerCount
           ? []
           : ticketList,
       count:
-        ticketList?.length <
-        ticketBody?.passengerCount + ticketBody?.childPassengerCount
+        ticketList?.length < passengerCount + childPassengerCount
           ? 0
           : totalCount,
       totalPages: totalPages,

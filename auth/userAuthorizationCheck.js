@@ -2,13 +2,16 @@ const User = require("../app/src/modules/users/user.model");
 const { generateOTP } = require("./generateOTP");
 const { createLog } = require("../app/src/modules/appLogs/appLog.service");
 
-const isUserAuthorized = async (phone_no) => {
+const isUserAuthorized = async (data) => {
   const authorizedUser = {};
   try {
-    phoneNoFound = await User.findOne({ phone_no: phone_no }).exec();
-    if (phoneNoFound) {
+    const phoneNoFound = await User.findOne({
+      phone_no: data?.phoneNo,
+      is_active: true,
+    }).exec();
+    if (phoneNoFound && data?.authSource === "nou") {
       try {
-        generateOTP(phone_no);
+        generateOTP(data?.phoneNo);
       } catch (err) {
         await createLog(err);
       } finally {
