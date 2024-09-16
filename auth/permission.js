@@ -9,6 +9,28 @@ const acl = async (req, res, next) => {
     const refreshToken = req?.headers["refresh"];
 
     if (!accessToken) {
+      if (refreshToken) {
+        const decodedRefreshToken = await verifyRefreshToken(req, refreshToken);
+
+        if (decodedRefreshToken) {
+          const newAccessToken =
+            await regenerateNewAccessToken(decodedRefreshToken);
+          if (newAccessToken) {
+            return res.status(200).send({
+              token: newAccessToken,
+              message: "New access token",
+            });
+          } else {
+            return res
+              .status(500)
+              .send({ token: false, message: "Internal server error" });
+          }
+        } else {
+          return res
+            .status(403)
+            .send({ token: false, message: "Invalid refresh token" });
+        }
+      }
       return res
         .status(401)
         .send({ token: false, message: "Access token missing" });
@@ -19,26 +41,6 @@ const acl = async (req, res, next) => {
     if (decodedAccessToken) {
       req.decoded = decodedAccessToken;
       next();
-    } else if (refreshToken) {
-      const decodedRefreshToken = await verifyRefreshToken(req, refreshToken);
-
-      if (decodedRefreshToken) {
-        delete decodedRefreshToken.exp;
-
-        const newAccessToken = jwt.sign(
-          decodedRefreshToken,
-          process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "15m" },
-        );
-
-        res.setHeader("Authorization", `Bearer ${newAccessToken}`);
-        req.decoded = decodedRefreshToken;
-        next();
-      } else {
-        return res
-          .status(401)
-          .send({ token: false, message: "Invalid refresh token" });
-      }
     } else {
       return res
         .status(401)
@@ -59,6 +61,19 @@ const verifyAccessToken = async (req, accessToken) => {
       process.env.ACCESS_TOKEN_SECRET,
     );
     return decodedToken;
+  } catch (error) {
+    return null;
+  }
+};
+
+const regenerateNewAccessToken = async (decodedRefreshToken) => {
+  try {
+    delete decodedRefreshToken.iat;
+    delete decodedRefreshToken.exp;
+
+    return jwt.sign(decodedRefreshToken, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "15m",
+    });
   } catch (error) {
     return null;
   }

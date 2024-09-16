@@ -99,7 +99,7 @@ const lookup = async (query, ticketBody) => {
     pageNo = 1,
     date = "date 31/12/9999",
     time = "time 11:59 PM",
-    seatType = "",
+    seatCategory = "",
     source = "",
     destination = "",
     passengerCount = 0,
@@ -118,7 +118,7 @@ const lookup = async (query, ticketBody) => {
     const journeyDateTime = dateTimeObject?.getTime();
 
     const totalCount = await Ticket.countDocuments({
-      seat_category: { $regex: seatType.toString() },
+      seat_category: { $regex: seatCategory.toString() },
       source: { $regex: source.toString() },
       destination: { $regex: destination.toString() },
       journey_date_time: journeyDateTime,
@@ -133,7 +133,7 @@ const lookup = async (query, ticketBody) => {
     });
 
     const ticketList = await Ticket.find({
-      seat_category: { $regex: seatType.toString() },
+      seat_category: { $regex: seatCategory.toString() },
       source: { $regex: source.toString() },
       destination: { $regex: destination.toString() },
       journey_date_time: journeyDateTime,

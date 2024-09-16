@@ -9,7 +9,7 @@ const isUserAuthorized = async (data) => {
       phone_no: data?.phoneNo,
       is_active: true,
     }).exec();
-    if (phoneNoFound && data?.authSource === "nou") {
+    if (phoneNoFound && data?.authSource === "nou-mobile") {
       try {
         generateOTP(data?.phoneNo);
       } catch (err) {

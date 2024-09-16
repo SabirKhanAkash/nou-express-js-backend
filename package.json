@@ -1,6 +1,6 @@
 {
   "name": "nou-express-js-backend",
-  "version": "1.2.0 beta",
+  "version": "1.3.0 beta",
   "description": "backend for nou app",
   "main": "app.js",
   "scripts": {

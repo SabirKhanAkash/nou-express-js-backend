@@ -3,6 +3,7 @@ require("dotenv").config();
 const app = express();
 var cors = require("cors");
 const userRouter = require("./app/src/modules/users/user.router");
+const regenerateToken = require("./auth/otpVerify.router");
 const otpVerifyRouter = require("./auth/otpVerify.router");
 const loginRouter = require("./auth/login.router");
 const ticketRouter = require("./app/src/modules/ticket/ticket.router");

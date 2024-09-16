@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
       .lean();
 
     if (user?.otp === req?.body?.otp) {
-      const authToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "15m",
       });
       const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
       });
 
       res.status(200).send({
-        authToken: authToken,
+        accessToken: accessToken,
         refreshToken: refreshToken,
         user: user,
         status: "Success",
