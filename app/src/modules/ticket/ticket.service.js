@@ -3,6 +3,7 @@ const Ticket = require("./ticket.model");
 const { createLog } = require("../appLogs/appLog.service");
 const package = require("../../../../package.json");
 const { paginate } = require("../../../../sharedUtils/paginate");
+const { options } = require("./ticket.router");
 const version = package?.version;
 
 const list = async () => {
@@ -118,9 +119,9 @@ const lookup = async (query, ticketBody) => {
     const journeyDateTime = dateTimeObject?.getTime();
 
     const totalCount = await Ticket.countDocuments({
-      seat_category: { $regex: seatCategory.toString() },
-      source: { $regex: source.toString() },
-      destination: { $regex: destination.toString() },
+      seat_category: seatCategory,
+      source: source,
+      destination: destination,
       journey_date_time: journeyDateTime,
       sold: false,
       is_active: true,
@@ -133,9 +134,9 @@ const lookup = async (query, ticketBody) => {
     });
 
     const ticketList = await Ticket.find({
-      seat_category: { $regex: seatCategory.toString() },
-      source: { $regex: source.toString() },
-      destination: { $regex: destination.toString() },
+      seat_category: seatCategory,
+      source: source,
+      destination: destination,
       journey_date_time: journeyDateTime,
       sold: false,
       is_active: true,
@@ -145,14 +146,8 @@ const lookup = async (query, ticketBody) => {
       .lean();
 
     lookupData = {
-      ticketList:
-        ticketList?.length < passengerCount + childPassengerCount
-          ? []
-          : ticketList,
-      count:
-        ticketList?.length < passengerCount + childPassengerCount
-          ? 0
-          : totalCount,
+      ticketList: ticketList,
+      count: totalCount,
       totalPages: totalPages,
       status: "Success",
     };
