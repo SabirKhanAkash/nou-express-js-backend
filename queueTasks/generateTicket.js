@@ -2,16 +2,27 @@ const { save } = require("../app/src/modules/ticket/ticket.service");
 const { ticketQueue } = require("./bullmq");
 
 const generateTicket = async () => {
+  // const seat_types = [
+  //   { name: "ফ্লোর", capacity: 36 },
+  //   { name: "ডেক", capacity: 81 },
+  //   { name: "চেয়ার", capacity: 121 },
+  //   { name: "এসি চেয়ার", capacity: 49 },
+  //   { name: "সিঙ্গেল কেবিন", capacity: 16 },
+  //   { name: "এসি সিঙ্গেল কেবিন", capacity: 4 },
+  //   { name: "ডাবল কেবিন", capacity: 16 },
+  //   { name: "এসি ডাবল কেবিন", capacity: 4 },
+  //   { name: "ভিআইপি", capacity: 4 },
+  // ];
   const seat_types = [
-    { name: "ফ্লোর", capacity: 36 },
-    { name: "ডেক", capacity: 81 },
-    { name: "চেয়ার", capacity: 121 },
-    { name: "এসি চেয়ার", capacity: 49 },
-    { name: "সিঙ্গেল কেবিন", capacity: 16 },
-    { name: "এসি সিঙ্গেল কেবিন", capacity: 4 },
-    { name: "ডাবল কেবিন", capacity: 16 },
-    { name: "এসি ডাবল কেবিন", capacity: 4 },
-    { name: "ভিআইপি", capacity: 4 },
+    { name: "FLOOR", capacity: 36 },
+    { name: "DECK", capacity: 81 },
+    { name: "CHAIR", capacity: 121 },
+    { name: "AC_CHAIR", capacity: 49 },
+    { name: "SINGLE_CABIN", capacity: 16 },
+    { name: "AC_SINGLE_CABIN", capacity: 4 },
+    { name: "DOUBLE_CABIN", capacity: 16 },
+    { name: "AC_DOUBLE_CABIN", capacity: 4 },
+    { name: "VIP", capacity: 4 },
   ];
 
   const masterStations = [
@@ -81,7 +92,9 @@ const generateTicket = async () => {
     "বরগুনা",
   ];
 
-  const stations = ["ঢাকা", "চাঁদপুর"];
+  // const stations = ["ঢাকা", "চাঁদপুর"];
+
+  const stations = ["DHAKA", "CHADPUR"];
 
   const journey_time = [
     "06:00 AM",

@@ -7,6 +7,7 @@ const regenerateToken = require("./auth/otpVerify.router");
 const otpVerifyRouter = require("./auth/otpVerify.router");
 const loginRouter = require("./auth/login.router");
 const ticketRouter = require("./app/src/modules/ticket/ticket.router");
+const allLookUpRouter = require("./app/src/modules/allLookUps/allLookUp.router");
 const { acl } = require("./auth/permission");
 
 app.use(express.json());
@@ -27,5 +28,6 @@ app.use(acl);
 
 app.use("/users", userRouter);
 app.use("/ticket", ticketRouter);
+app.use("/all-lookup", allLookUpRouter);
 
 module.exports = app;

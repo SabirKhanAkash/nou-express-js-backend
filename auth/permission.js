@@ -13,27 +13,29 @@ const acl = async (req, res, next) => {
         const decodedRefreshToken = await verifyRefreshToken(req, refreshToken);
 
         if (decodedRefreshToken) {
-          const newAccessToken =
-            await regenerateNewAccessToken(decodedRefreshToken);
-          if (newAccessToken) {
+          const { newAccessToken, newRefreshToken } =
+            await regenerateNewTokens(decodedRefreshToken);
+
+          if (newAccessToken && newRefreshToken) {
             return res.status(200).send({
-              token: newAccessToken,
-              message: "New access token",
+              accessToken: newAccessToken,
+              refreshToken: newRefreshToken,
+              message: "New access and refresh token",
             });
           } else {
             return res
               .status(500)
-              .send({ token: false, message: "Internal server error" });
+              .send({ status: "Failed", message: "Internal server error" });
           }
         } else {
           return res
             .status(403)
-            .send({ token: false, message: "Invalid refresh token" });
+            .send({ status: "Failed", message: "Refresh token invalid" });
         }
       }
       return res
         .status(401)
-        .send({ token: false, message: "Access token missing" });
+        .send({ status: "Failed", message: "Access token missing" });
     }
     userData.infos = await getUserData(accessToken);
 
@@ -44,13 +46,13 @@ const acl = async (req, res, next) => {
     } else {
       return res
         .status(401)
-        .send({ token: false, message: "Invalid access token" });
+        .send({ status: "Failed", message: "Invalid access token" });
     }
   } catch (error) {
     await createLog(error);
     return res
       .status(500)
-      .send({ token: false, message: "Internal server error" });
+      .send({ status: "Failed", message: "Internal server error" });
   }
 };
 
@@ -66,14 +68,24 @@ const verifyAccessToken = async (req, accessToken) => {
   }
 };
 
-const regenerateNewAccessToken = async (decodedRefreshToken) => {
+const regenerateNewTokens = async (decodedRefreshToken) => {
   try {
     delete decodedRefreshToken.iat;
     delete decodedRefreshToken.exp;
 
-    return jwt.sign(decodedRefreshToken, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "15m",
-    });
+    const newAccessToken = jwt.sign(
+      decodedRefreshToken,
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_LIFESPAN },
+    );
+
+    const newRefreshToken = jwt.sign(
+      decodedRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: process.env.REFRESH_TOKEN_LIFESPAN },
+    );
+
+    return { newAccessToken, newRefreshToken };
   } catch (error) {
     return null;
   }

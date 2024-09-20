@@ -1,0 +1,3 @@
+to add a specific vendor to all "seat_category" type entries of allLookUp collection:
+
+db["alllookups"].updateMany({type: "seat_category", is_active: true}, {$set: {"vendors": [{id: "655b8eac5ecc4a247d84f2dd", is_active: true}]}});

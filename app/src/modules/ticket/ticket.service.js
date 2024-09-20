@@ -49,15 +49,15 @@ const save = async (data) => {
       data.journey_date_time = journeyDate.getTime();
 
       for (let seat_count = 0; seat_count < data?.count; seat_count++) {
-        if (data?.seat_category == "ফ্লোর") data.price = 70;
-        if (data?.seat_category == "ডেক") data.price = 100;
-        if (data?.seat_category == "চেয়ার") data.price = 150;
-        if (data?.seat_category == "এসি চেয়ার") data.price = 200;
-        if (data?.seat_category == "সিঙ্গেল কেবিন") data.price = 800;
-        if (data?.seat_category == "এসি সিঙ্গেল কেবিন") data.price = 1000;
-        if (data?.seat_category == "ডাবল কেবিন") data.price = 1200;
-        if (data?.seat_category == "এসি ডাবল কেবিন") data.price = 1500;
-        if (data?.seat_category == "ভিআইপি") data.price = 2000;
+        if (data?.seat_category == "FLOOR") data.price = 70;
+        if (data?.seat_category == "DECK") data.price = 100;
+        if (data?.seat_category == "CHAIR") data.price = 150;
+        if (data?.seat_category == "AC_CHAIR") data.price = 200;
+        if (data?.seat_category == "SINGLE_CABIN") data.price = 800;
+        if (data?.seat_category == "AC_SINGLE_CABIN") data.price = 1000;
+        if (data?.seat_category == "DOUBLE_CABIN") data.price = 1200;
+        if (data?.seat_category == "AC_DOUBLE_CABIN") data.price = 1500;
+        if (data?.seat_category == "VIP") data.price = 2000;
         saveData = new Ticket(data).save();
         success++;
       }
@@ -142,6 +142,7 @@ const lookup = async (query, ticketBody) => {
       is_active: true,
     })
       .skip(skipValue)
+      .limit(perPage)
       .sort({ price: 1 })
       .lean();
 

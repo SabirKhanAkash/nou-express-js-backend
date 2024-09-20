@@ -17,10 +17,10 @@ router.post("/", async (req, res) => {
 
     if (user?.otp === req?.body?.otp) {
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m",
+        expiresIn: process.env.ACCESS_TOKEN_LIFESPAN,
       });
       const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "7d",
+        expiresIn: process.env.REFRESH_TOKEN_LIFESPAN,
       });
 
       res.status(200).send({
