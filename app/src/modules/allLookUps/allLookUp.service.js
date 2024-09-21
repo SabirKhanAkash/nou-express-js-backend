@@ -9,6 +9,7 @@ const list = async (query) => {
   const {
     pageNo = 1,
     perPage = 20,
+    orderValue = 0,
     type = "",
     title = "",
     titleBn = "",
@@ -22,6 +23,7 @@ const list = async (query) => {
         { title_bn: { $regex: titleBn, $options: "i" } },
       ],
       $and: [
+        { order_value: { $gt: orderValue } },
         { type: { $regex: type, $options: "i" } },
         { is_active: true },
         {
@@ -47,6 +49,7 @@ const list = async (query) => {
         { title_bn: { $regex: titleBn, $options: "i" } },
       ],
       $and: [
+        { order_value: { $gt: orderValue } },
         { type: { $regex: type, $options: "i" } },
         { is_active: true },
         {

@@ -10,6 +10,12 @@ const vendorSchema = new mongoose.Schema({
   is_active: {
     type: Boolean,
   },
+  price: {
+    type: Number,
+  },
+  capacity: {
+    type: Number,
+  },
 });
 
 // create allLookUp schema

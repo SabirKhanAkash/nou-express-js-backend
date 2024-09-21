@@ -4,6 +4,7 @@ const { createLog } = require("../appLogs/appLog.service");
 const package = require("../../../../package.json");
 const { paginate } = require("../../../../sharedUtils/paginate");
 const { options } = require("./ticket.router");
+const AllLookUp = require("../allLookUps/allLookUp.model");
 const version = package?.version;
 
 const list = async () => {
@@ -35,7 +36,7 @@ const save = async (data) => {
     failure = 0;
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+  const month = String(today.getMonth() + 1).padStart(2, "0");
 
   try {
     for (let hour = 0; hour < data?.journey_time?.length; hour++) {
@@ -49,15 +50,24 @@ const save = async (data) => {
       data.journey_date_time = journeyDate.getTime();
 
       for (let seat_count = 0; seat_count < data?.count; seat_count++) {
-        if (data?.seat_category == "FLOOR") data.price = 70;
-        if (data?.seat_category == "DECK") data.price = 100;
-        if (data?.seat_category == "CHAIR") data.price = 150;
-        if (data?.seat_category == "AC_CHAIR") data.price = 200;
-        if (data?.seat_category == "SINGLE_CABIN") data.price = 800;
-        if (data?.seat_category == "AC_SINGLE_CABIN") data.price = 1000;
-        if (data?.seat_category == "DOUBLE_CABIN") data.price = 1200;
-        if (data?.seat_category == "AC_DOUBLE_CABIN") data.price = 1500;
-        if (data?.seat_category == "VIP") data.price = 2000;
+        if (data?.seat_category == "FLOOR")
+          data.price = data?.price ? data.price : 70;
+        if (data?.seat_category == "DECK")
+          data.price = data?.price ? data.price : 100;
+        if (data?.seat_category == "CHAIR")
+          data.price = data?.price ? data.price : 150;
+        if (data?.seat_category == "AC_CHAIR")
+          data.price = data?.price ? data.price : 200;
+        if (data?.seat_category == "SINGLE_CABIN")
+          data.price = data?.price ? data.price : 800;
+        if (data?.seat_category == "AC_SINGLE_CABIN")
+          data.price = data?.price ? data.price : 1000;
+        if (data?.seat_category == "DOUBLE_CABIN")
+          data.price = data?.price ? data.price : 1200;
+        if (data?.seat_category == "AC_DOUBLE_CABIN")
+          data.price = data?.price ? data.price : 1500;
+        if (data?.seat_category == "VIP")
+          data.price = data?.price ? data.price : 2000;
         saveData = new Ticket(data).save();
         success++;
       }
