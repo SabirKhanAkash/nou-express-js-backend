@@ -11,7 +11,7 @@ router.post("/", async (req, res) => {
       is_active: true,
     })
       .select(
-        "-_id approval_status app_version dob otp phone_no role username village",
+        "approval_status app_version dob otp phone_no role username village",
       )
       .lean();
 
