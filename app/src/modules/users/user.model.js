@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   created_date: {
-    type: String,
+    type: Number,
     default: new Date(),
   },
   created_by: {
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     default: "System",
   },
   updated_date: {
-    type: String,
+    type: Number,
     default: null,
   },
   updated_by: {

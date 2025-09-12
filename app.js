@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 var cors = require("cors");
 const userRouter = require("./app/src/modules/users/user.router");
-const regenerateToken = require("./auth/otpVerify.router");
+const authRouter = require("./auth/refreshAccessToken");
 const otpVerifyRouter = require("./auth/otpVerify.router");
 const loginRouter = require("./auth/login.router");
 const ticketRouter = require("./app/src/modules/ticket/ticket.router");
@@ -26,6 +26,7 @@ require("./queueTasks/worker.js");
 // ACL verification
 app.use(acl);
 
+app.use("/refresh-access-token", authRouter);
 app.use("/users", userRouter);
 app.use("/ticket", ticketRouter);
 app.use("/all-lookup", allLookUpRouter);

@@ -7,8 +7,12 @@ const acl = async (req, res, next) => {
   try {
     const accessToken = req?.headers["authorization"]?.split(" ")[1];
     const refreshToken = req?.headers["refresh"];
+    // console.log("Access token OG: " + req?.headers["authorization"]);
+    console.log("Access token: " + accessToken);
+    console.log("Refresh token: " + refreshToken);
 
     if (!accessToken) {
+      // console.log("Access token OG: " + req?.headers["authorization"]);
       if (refreshToken) {
         const decodedRefreshToken = await verifyRefreshToken(req, refreshToken);
 
@@ -60,7 +64,7 @@ const verifyAccessToken = async (req, accessToken) => {
   try {
     const decodedToken = jwt.verify(
       accessToken,
-      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_SECRET
     );
     return decodedToken;
   } catch (error) {
@@ -76,13 +80,13 @@ const regenerateNewTokens = async (decodedRefreshToken) => {
     const newAccessToken = jwt.sign(
       decodedRefreshToken,
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_LIFESPAN },
+      { expiresIn: process.env.ACCESS_TOKEN_LIFESPAN }
     );
 
     const newRefreshToken = jwt.sign(
       decodedRefreshToken,
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_LIFESPAN },
+      { expiresIn: process.env.REFRESH_TOKEN_LIFESPAN }
     );
 
     return { newAccessToken, newRefreshToken };
@@ -95,7 +99,7 @@ const verifyRefreshToken = async (req, refreshToken) => {
   try {
     const decodedToken = jwt.verify(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_SECRET
     );
     return decodedToken;
   } catch (error) {

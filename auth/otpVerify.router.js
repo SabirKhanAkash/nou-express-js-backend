@@ -11,9 +11,14 @@ router.post("/", async (req, res) => {
       is_active: true,
     })
       .select(
-        "approval_status app_version dob otp phone_no role username village",
+        "approval_status app_version dob otp phone_no role username village"
       )
       .lean();
+
+    console.log("req?.body?.phoneNo: ", req?.body?.phoneNo);
+    console.log("user: : ", user);
+    console.log("user?.otp: ", user?.otp);
+    console.log("req?.body?.otp: ", req?.body?.otp);
 
     if (user?.otp === req?.body?.otp) {
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -34,6 +39,7 @@ router.post("/", async (req, res) => {
       res.status(403).send({ status: "Failed", message: "otp not matched" });
     }
   } catch (e) {
+    console.log(e);
     await createLog(e);
     res
       .status(500)
